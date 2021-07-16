@@ -15,7 +15,7 @@ Steps to reproduce the behavior:
 
 > Ex.
 >
-> 1. Install stactools and stactools-package dataset
+> 1. Install stactools and stactools-jrc-gsw dataset
 > 2. Run `scripts/test`
 > 3. See error
 
