@@ -1,4 +1,4 @@
-name: stactools-package
+name: stactools-jrc-gsw
 channels:
   - conda-forge
   - defaults
