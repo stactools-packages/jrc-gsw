@@ -8,6 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 - Community profile files added based on https://docs.github.com/en/communities.
 - Changelog added based on https://keepachangelog.com/en/1.0.0/.
 - Added commands for working with STAC
+  - Added Scientific, Projection extensions
 - Manually added metadata to constants.py
 ### Deprecated
 - Nothing.

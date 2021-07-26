@@ -7,6 +7,7 @@
 - Dataset homepage: https://global-surface-water.appspot.com/
 - STAC extensions used:
   - [Scientific](https://github.com/stac-extensions/scientific/)
+  - [Projection](https://github.com/stac-extensions/projection/)
 
 
 Datasets from the European Commission Joint Research Centre - Global Surface Water which presents different  surface water metrics between 1984-2020.
