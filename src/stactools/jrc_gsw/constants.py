@@ -8,7 +8,7 @@ CORE_JSC_GSW = dict(
     TITLE="European Commission Joint Research Centre - Global Surface Water",
     DESCRIPTION=
     "Collection of Global Surface Water products from the European Commission Joint Research Centre. This collection presents different surface water products between 1984-2020 from Landsat 5,7, and 8 sensors.",
-    CRS=CRS.from_epsg(4326),
+    EPSG=4326,
     DOI="10.1038/nature20584",
     CITATION=
     "Jean-Francois Pekel, Andrew Cottam, Noel Gorelick, Alan S. Belward, High-resolution mapping of global surface water and its long-term changes. Nature 540, 418-422 (2016)",

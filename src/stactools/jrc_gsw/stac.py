@@ -9,6 +9,7 @@ from shapely.geometry import box, mapping, shape
 import pystac
 from pystac.asset import Asset
 from pystac.extensions.scientific import ScientificExtension
+from pystac.extensions.projection import ProjectionExtension
 from stactools.jrc_gsw.constants import (CORE_JSC_GSW, JRC_GSW_PROVIDER,
                                          OCCURRENCE, CHANGE, SEASONALITY,
                                          RECURRENCE, TRANSITIONS, EXTENT)
@@ -68,6 +69,9 @@ def create_item(tif_href: str) -> pystac.Item:
     item.common_metadata.start_datetime = start_datetime
     item.common_metadata.end_datetime = end_datetime
     item.common_metadata.providers = [JRC_GSW_PROVIDER]
+
+    projection = ProjectionExtension.ext(item, add_if_missing=True)
+    projection.epsg = CORE_JSC_GSW.get("EPSG")
 
     scientific = ScientificExtension.ext(item, add_if_missing=True)
     scientific.doi = CORE_JSC_GSW.get("DOI")
