@@ -3,15 +3,22 @@ import click
 import logging
 
 from stactools.jrc_gsw import stac
-from stactools.jrc_gsw.constants import (CORE_JSC_GSW, OCCURRENCE, CHANGE,
-                                         SEASONALITY, RECURRENCE, TRANSITIONS,
-                                         EXTENT)
+from stactools.jrc_gsw.constants import (
+    CORE_JSC_GSW,
+    OCCURRENCE,
+    CHANGE,
+    SEASONALITY,
+    RECURRENCE,
+    TRANSITIONS,
+    EXTENT,
+)
 
 logger = logging.getLogger(__name__)
 
 
 def create_jrc_gsw_command(cli):
     """Creates the joint research centre - global surface water command line utility."""
+
     @cli.group(
         "jrc-gsw",
         short_help=("Commands for working with JRC-GSW data."),

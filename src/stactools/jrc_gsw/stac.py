@@ -1,96 +1,135 @@
-import os
-from datetime import datetime
-import pytz
+from typing import Optional
+import re
+from pystac.common_metadata import CommonMetadata
+from pystac.extensions.item_assets import ItemAssetsExtension
 import logging
 
 import rasterio as rio
 from shapely.geometry import box, mapping, shape
-
 import pystac
 from pystac.asset import Asset
 from pystac.extensions.scientific import ScientificExtension
 from pystac.extensions.projection import ProjectionExtension
-from stactools.jrc_gsw.constants import (CORE_JSC_GSW, JRC_GSW_PROVIDER,
-                                         OCCURRENCE, CHANGE, SEASONALITY,
-                                         RECURRENCE, TRANSITIONS, EXTENT)
+from stactools.core.io import ReadHrefModifier
+from stactools.core.projection import reproject_geom
+from stactools.jrc_gsw.assets import (
+    ITEM_ASSETS,
+    CHANGE_KEY,
+    EXTENT_KEY,
+    OCCURRENCE_KEY,
+    RECURRENCE_KEY,
+    SEASONALITY_KEY,
+    TRANSITIONS_KEY,
+)
+
+from stactools.jrc_gsw.constants import (
+    CITATION,
+    COLLECTION_DESCRIPTION,
+    COLLECTION_ID,
+    COLLECTION_TITLE,
+    DOI,
+    END_TIME,
+    EPSG,
+    ID_REGEX,
+    JRC_GSW_PROVIDER,
+    LICENSE,
+    SEASONALITY_START_TIME,
+    SPATIAL_EXTENT,
+    START_TIME,
+)
 
 logger = logging.getLogger(__name__)
 
 
-def create_item(tif_href: str) -> pystac.Item:
-    """Creates a STAC item for a JRC-GSW dataset.
+class UnexpectedPathError(Exception):
+    pass
 
-    Args:
-        tif_href (str): Path to input tif.
+
+def create_item(
+    change_href: str,
+    extent_href: str,
+    occurrence_href: str,
+    recurrence_href: str,
+    seasonality_href: str,
+    transitions_href: str,
+    read_href_modifier: Optional[ReadHrefModifier] = None,
+) -> pystac.Item:
+    """Creates a STAC item for a JRC-GSW dataset.
 
     Returns:
         pystac.Item: STAC Item object.
     """
+    if not read_href_modifier:
+        read_href_modifier = lambda x: x
 
-    with rio.open(tif_href) as f:
-        bounds = f.bounds
+    # Gather information from one of the tiffs as they are
+    # all the same.
+    with rio.open(read_href_modifier(change_href)) as ds:
+        image_shape = list(ds.shape)
+        original_bbox = list(ds.bounds)
+        transform = list(ds.transform)
+        geom = reproject_geom(
+            ds.crs, "epsg:4326", mapping(box(*ds.bounds)), precision=6
+        )
 
-    item_id = os.path.basename(tif_href).replace('.tif', '')
-    dataset_group = item_id.split("_")[0]
-    geom = mapping(box(bounds.left, bounds.bottom, bounds.right, bounds.top))
-    bbox = shape(geom).bounds
+    # Get ID, e.g. 0E_40Nv1_3_2020
+    m = re.match(ID_REGEX, change_href)
+    if not m:
+        raise UnexpectedPathError(
+            f"{change_href} does not fit stactool's expected format"
+        )
 
-    metadata_datasets = {}
-    metadata_datasets['occurrence'] = OCCURRENCE
-    metadata_datasets['change'] = CHANGE
-    metadata_datasets['seasonality'] = SEASONALITY
-    metadata_datasets['recurrence'] = RECURRENCE
-    metadata_datasets['transitions'] = TRANSITIONS
-    metadata_datasets['extent'] = EXTENT
+    item_id = m.group(1)
+    bbox = list(shape(geom).bounds)
 
-    metadata = metadata_datasets.get(dataset_group)
-
-    # Datetime in UTC
-    utc = pytz.utc
-    start_datetime = utc.localize(
-        datetime.strptime(metadata.get("START_TIME"), "%d/%m/%Y"))
-    end_datetime = utc.localize(
-        datetime.strptime(metadata.get("END_TIME"), "%d/%m/%Y"))
+    start_datetime = START_TIME
+    end_datetime = END_TIME
 
     # Create item
-    item = pystac.Item(id=item_id,
-                       geometry=geom,
-                       bbox=bbox,
-                       datetime=None,
-                       properties={
-                           'start_datetime': start_datetime,
-                           'end_datetime': end_datetime,
-                       })
+    item = pystac.Item(
+        id=item_id,
+        geometry=geom,
+        bbox=bbox,
+        datetime=None,
+        properties={
+            "start_datetime": start_datetime,
+            "end_datetime": end_datetime,
+        },
+    )
 
-    item.common_metadata.title = f"jrc-gsw-{dataset_group}"
-    item.common_metadata.description = (
-        "Joint Research Centre - Global Surface Water "
-        f"in 10x10 degree tiles. This item is for the {dataset_group} data.")
-    item.common_metadata.start_datetime = start_datetime
-    item.common_metadata.end_datetime = end_datetime
-    item.common_metadata.providers = [JRC_GSW_PROVIDER]
+    item.common_metadata.start_datetime = START_TIME
+    item.common_metadata.end_datetime = END_TIME
 
     projection = ProjectionExtension.ext(item, add_if_missing=True)
-    projection.epsg = CORE_JSC_GSW.get("EPSG")
+    projection.epsg = EPSG
+    projection.bbox = original_bbox
+    projection.shape = image_shape
+    projection.transform = transform[:6]
 
     scientific = ScientificExtension.ext(item, add_if_missing=True)
-    scientific.doi = CORE_JSC_GSW.get("DOI")
-    scientific.citation = CORE_JSC_GSW.get("CITATION")
+    scientific.doi = DOI
+    scientific.citation = CITATION
 
-    item.add_asset(
-        "data",
-        pystac.Asset(
-            href=tif_href,
-            media_type=pystac.MediaType.COG,
-            roles=["data"],
-            title="JRC GSW Cloud Optimized Geotiff",
-        ),
-    )
+    for key, href in [
+        (SEASONALITY_KEY, seasonality_href),
+        (OCCURRENCE_KEY, occurrence_href),
+        (CHANGE_KEY, change_href),
+        (RECURRENCE_KEY, recurrence_href),
+        (TRANSITIONS_KEY, transitions_href),
+        (EXTENT_KEY, extent_href),
+    ]:
+        item.add_asset(key, ITEM_ASSETS[key].create_asset(href))
+
+    # Set start time on seasonality as it is different from others
+    seasonality_common_metadata = CommonMetadata(item.assets[SEASONALITY_KEY])
+    seasonality_common_metadata.start_datetime = SEASONALITY_START_TIME
+    # JSON validation Requires that we also set end time
+    seasonality_common_metadata.end_datetime = END_TIME
 
     return item
 
 
-def create_collection(metadata: dict) -> pystac.Collection:
+def create_collection() -> pystac.Collection:
     """Create a STAC collection for a European Commission
     Joint Research Centre - Global Surface Water dataset.
 
@@ -101,39 +140,37 @@ def create_collection(metadata: dict) -> pystac.Collection:
         pystac.Collection: pystac collection object
     """
 
-    utc = pytz.utc
-    start_datetime = utc.localize(
-        datetime.strptime(metadata.get("START_TIME"), "%d/%m/%Y"))
-    end_datetime = utc.localize(
-        datetime.strptime(metadata.get("END_TIME"), "%d/%m/%Y"))
-    bbox = box(*metadata.get("SPATIAL_EXTENT")).bounds
-
     collection = pystac.Collection(
-        id=metadata.get("ID"),
-        title=metadata.get("TITLE"),
-        description=metadata.get("DESCRIPTION"),
-        providers=CORE_JSC_GSW.get("PROVIDERS"),
-        license=CORE_JSC_GSW.get("LICENSE"),
+        id=COLLECTION_ID,
+        title=COLLECTION_TITLE,
+        description=COLLECTION_DESCRIPTION,
+        providers=[JRC_GSW_PROVIDER],
+        license=LICENSE,
         extent=pystac.Extent(
-            pystac.SpatialExtent([bbox]),
-            pystac.TemporalExtent([start_datetime, end_datetime])),
+            pystac.SpatialExtent([SPATIAL_EXTENT]),
+            pystac.TemporalExtent([START_TIME, END_TIME]),
+        ),
         catalog_type=pystac.CatalogType.RELATIVE_PUBLISHED,
     )
 
     scientific = ScientificExtension.ext(collection, add_if_missing=True)
-    scientific.doi = CORE_JSC_GSW.get("DOI")
-    scientific.citation = CORE_JSC_GSW.get("CITATION")
+    scientific.doi = DOI
+    scientific.citation = CITATION
+
+    item_assets = ItemAssetsExtension.ext(collection, add_if_missing=True)
+    item_assets.item_assets = ITEM_ASSETS
 
     collection.add_asset(
-        "metadata",
+        "guide",
         Asset(
             href=(
                 "https://storage.cloud.google.com/global-surface-water/downloads_ancillary/DataUsersGuidev2020.pdf"  # noqa
             ),
             title="User Guide",
-            description=(
-                "Data user guide and description of the JRC GSW datasets."),
+            description=("Data user guide and description of the JRC GSW datasets."),
             media_type="application/pdf",
-            roles=["metadata"]))
+            roles=["metadata"],
+        ),
+    )
 
     return collection
