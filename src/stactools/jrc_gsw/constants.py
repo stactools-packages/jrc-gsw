@@ -23,7 +23,7 @@ JRC_GSW_PROVIDER = pystac.Provider(
 )
 
 # Regex to extract IDs out of file names
-ID_REGEX = re.compile(r".*_(\d+E_\d+Nv\d_\d_\d+).*")
+ID_REGEX = re.compile(r".*_(\d+(E|W)_\d+(N|S)v\d_\d_\d+).*")
 
 # The overall start and end datetime for this collection.
 START_TIME = str_to_datetime("1984-03-01T00:00:00Z")

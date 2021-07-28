@@ -1,5 +1,7 @@
+import re
 import unittest
 
+from stactools.jrc_gsw.constants import ID_REGEX
 from stactools.jrc_gsw.stac import create_collection, create_item
 
 from tests import test_data
@@ -41,3 +43,9 @@ class TestSTAC(unittest.TestCase):
         with open("collection.json", "w") as f:
             json.dump(collection.to_dict(), f, indent=2)
         collection.validate()
+
+    def test_item_id_parsing(self):
+        paths = ["change/change_110W_20Sv1_3_2020cog.tif"]
+
+        for path in paths:
+            self.assertIsNotNone(re.match(ID_REGEX, path))
