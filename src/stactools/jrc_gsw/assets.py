@@ -4,7 +4,7 @@ from pystac.extensions.item_assets import AssetDefinition
 
 SEASONALITY_KEY = "seasonality"
 OCCURRENCE_KEY = "occurrence"
-CHANGE_KEY = "occurrence_change"
+CHANGE_KEY = "change"
 RECURRENCE_KEY = "recurrence"
 TRANSITIONS_KEY = "transitions"
 EXTENT_KEY = "extent"
