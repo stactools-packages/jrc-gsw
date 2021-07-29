@@ -29,19 +29,15 @@ class TestSTAC(unittest.TestCase):
         item = create_item(**args)
 
         self.assertEqual(item.id, "0E_40Nv1_3_2020")
-        import json
 
-        with open("item.json", "w") as f:
-            json.dump(item.to_dict(), f, indent=2)
+        for key, asset in item.assets.items():
+            self.assertIn(key, asset.href)
+
         item.validate()
 
     def test_create_collection(self):
         collection = create_collection()
         collection.set_root(None)
-        import json
-
-        with open("collection.json", "w") as f:
-            json.dump(collection.to_dict(), f, indent=2)
         collection.validate()
 
     def test_item_id_parsing(self):
