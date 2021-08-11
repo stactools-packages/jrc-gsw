@@ -1,6 +1,6 @@
 # stactools-package jrc-gsw
 
-- Name: Joint Research Centre - Global Surface Water
+- Name: EC Joint Research Centre - Global Surface Water
 - Package: `stactools.jrc_gsw`
 - PyPI: https://pypi.org/project/stactools-package/
 - Owner: @sparkgeo
@@ -10,7 +10,7 @@
   - [Projection](https://github.com/stac-extensions/projection/)
 
 
-Datasets from the European Commission Joint Research Centre - Global Surface Water which presents different  surface water metrics between 1984-2020.
+Global surface water products from the European Commission Joint Research Centre, based on Landsat 5, 7, and 8 imagery.  Layers in this collection describe the occurrence, change, and seasonality of surface water from 1984-2020.
 
 ## Usage
 
