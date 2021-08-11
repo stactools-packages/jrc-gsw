@@ -167,7 +167,7 @@ def create_collection() -> pystac.Collection:
                 "https://storage.cloud.google.com/global-surface-water/downloads_ancillary/DataUsersGuidev2020.pdf"  # noqa
             ),
             title="User Guide",
-            description=("Data user guide and description of the JRC GSW datasets."),
+            description=("Data users guide and description of the JRC GSW datasets."),
             media_type="application/pdf",
             roles=["metadata"],
         ),

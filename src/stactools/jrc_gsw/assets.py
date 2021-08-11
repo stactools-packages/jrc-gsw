@@ -10,26 +10,12 @@ TRANSITIONS_KEY = "transitions"
 EXTENT_KEY = "extent"
 
 ITEM_ASSETS: Dict[str, AssetDefinition] = {
-    SEASONALITY_KEY: AssetDefinition(
-        {
-            "title": "Water Seasonality",
-            "description": (
-                "Provides information concerning the intra-annual behaviour of water "
-                "surfaces for a single year (2020) and shows permanent and seasonal  "
-                "water  and  the number  of  months  waterwas present."
-            ),
-            "type": pystac.MediaType.COG,
-            "roles": ["data"],
-        }
-    ),
     OCCURRENCE_KEY: AssetDefinition(
         {
-            "title": "Water Occurrence",
+            "title": "Occurrence",
             "description": (
-                "Shows where surface water occurred between 1984 and 2020 "
-                "and provides information concerning overall water dynamics. This "
-                "product captures both the intra and inter-annual "
-                "variability and changes."
+                "Frequency with which water was present from March 1984 to "
+                "December 2020"
             ),
             "type": pystac.MediaType.COG,
             "roles": ["data"],
@@ -37,11 +23,21 @@ ITEM_ASSETS: Dict[str, AssetDefinition] = {
     ),
     CHANGE_KEY: AssetDefinition(
         {
-            "title": "Water Occurrence Change",
+            "title": "Occurrence Change Intensity",
             "description": (
-                "Provides information on where surface water occurrence increased, "
-                "decreased or remained the same between 1984-1999 and 2000-2020. "
-                "Both the direction of change and its intensity are documented."
+                "Change in water occurrence between the two periods (1984-1999) "
+                "and (2000-2020)"
+            ),
+            "type": pystac.MediaType.COG,
+            "roles": ["data"],
+        }
+    ),
+    SEASONALITY_KEY: AssetDefinition(
+        {
+            "title": "Seasonality",
+            "description": (
+                "Number of months that water was present from January 2020 to "
+                "December 2020"
             ),
             "type": pystac.MediaType.COG,
             "roles": ["data"],
@@ -49,23 +45,17 @@ ITEM_ASSETS: Dict[str, AssetDefinition] = {
     ),
     RECURRENCE_KEY: AssetDefinition(
         {
-            "title": "Water Recurrence",
-            "description": (
-                "Provides information concerning the inter-annual behavior of water "
-                "surfaces and captures the frequency with which water returns "
-                "from year to year."
-            ),
+            "title": "Recurrence",
+            "description": ("Frequency with which water returns from year to year"),
             "type": pystac.MediaType.COG,
             "roles": ["data"],
         }
     ),
     TRANSITIONS_KEY: AssetDefinition(
         {
-            "title": "Water Transitions",
+            "title": "Transitions",
             "description": (
-                "Provides information on the change in seasonality between the first "
-                "and last years and captures changes between the three classes of not "
-                "water, seasonal water, and permanent water."
+                "Categorical change in surface water status from 1984 to 2020"
             ),
             "type": pystac.MediaType.COG,
             "roles": ["data"],
@@ -75,8 +65,7 @@ ITEM_ASSETS: Dict[str, AssetDefinition] = {
         {
             "title": "Maximum Water Extent",
             "description": (
-                "Provides information on all the locations ever detected as water over "
-                "a 37-year period. It is the union of all of the other datasets"
+                "Binary indicator of whether water was ever present (from 1984-2020)"
             ),
             "type": pystac.MediaType.COG,
             "roles": ["data"],

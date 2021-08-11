@@ -7,17 +7,12 @@ from pystac.utils import str_to_datetime
 
 COLLECTION_ID = "jrc-gsw"
 COLLECTION_TITLE = "European Commission Joint Research Centre - Global Surface Water"
-COLLECTION_DESCRIPTION = (
-    "Collection of Global Surface Water products from the "
-    "European Commission Joint Research Centre. This collection presents "
-    "different surface water products between 1984-2020 from "
-    "Landsat 5,7, and 8 sensors."
-)
+COLLECTION_DESCRIPTION = "Global surface water products from the European Commission Joint Research Centre, based on Landsat 5, 7, and 8 imagery.  Layers in this collection describe the occurrence, change, and seasonality of surface water from 1984-2020."
 LICENSE = "CC-BY-4.0"
 SPATIAL_EXTENT = [-180.0, -56.0, 180.0, 78.0]
 
 JRC_GSW_PROVIDER = pystac.Provider(
-    name="Joint Research Centre - Global Surface Water",
+    name="European Commission Joint Research Centre",
     roles=[pystac.ProviderRole.PRODUCER, pystac.ProviderRole.PROCESSOR],
     url="https://global-surface-water.appspot.com/",
 )
