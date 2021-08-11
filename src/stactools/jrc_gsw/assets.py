@@ -43,9 +43,7 @@ ITEM_ASSETS: Dict[str, AssetDefinition] = {
     RECURRENCE_KEY: AssetDefinition(
         {
             "title": "Recurrence",
-            "description": (
-                "Frequency with which water returns from year to year"
-            ),
+            "description": ("Frequency with which water returns from year to year"),
             "type": pystac.MediaType.COG,
             "roles": ["data"],
         }
