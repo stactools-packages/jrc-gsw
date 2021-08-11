@@ -14,7 +14,8 @@ ITEM_ASSETS: Dict[str, AssetDefinition] = {
         {
             "title": "Occurrence",
             "description": (
-                "Frequency with which water was present from March 1984 to December 2020"
+                "Frequency with which water was present from March 1984 to "
+                "December 2020"
             ),
             "type": pystac.MediaType.COG,
             "roles": ["data"],
@@ -24,7 +25,8 @@ ITEM_ASSETS: Dict[str, AssetDefinition] = {
         {
             "title": "Occurrence Change Intensity",
             "description": (
-                "Change in water occurrence between the two periods (1984-1999) and (2000-2020)"
+                "Change in water occurrence between the two periods (1984-1999) "
+                "and (2000-2020)"
             ),
             "type": pystac.MediaType.COG,
             "roles": ["data"],
@@ -34,7 +36,8 @@ ITEM_ASSETS: Dict[str, AssetDefinition] = {
         {
             "title": "Seasonality",
             "description": (
-                "Number of months that water was present from January 2020 to December 2020"
+                "Number of months that water was present from January 2020 to "
+                "December 2020"
             ),
             "type": pystac.MediaType.COG,
             "roles": ["data"],
