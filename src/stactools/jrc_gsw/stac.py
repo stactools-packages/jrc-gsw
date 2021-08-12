@@ -1,5 +1,5 @@
 from typing import Optional
-import re
+
 from pystac.common_metadata import CommonMetadata
 from pystac.extensions.item_assets import ItemAssetsExtension
 import logging
@@ -27,10 +27,10 @@ from stactools.jrc_gsw.constants import (
     COLLECTION_DESCRIPTION,
     COLLECTION_ID,
     COLLECTION_TITLE,
+    DATA_VERSION,
     DOI,
     END_TIME,
     EPSG,
-    ID_REGEX,
     JRC_GSW_PROVIDER,
     LICENSE,
     SEASONALITY_START_TIME,
@@ -46,12 +46,8 @@ class UnexpectedPathError(Exception):
 
 
 def create_item(
-    change_href: str,
-    extent_href: str,
-    occurrence_href: str,
-    recurrence_href: str,
-    seasonality_href: str,
-    transitions_href: str,
+    source: str,
+    tile_id: str,
     read_href_modifier: Optional[ReadHrefModifier] = None,
 ) -> pystac.Item:
     """Creates a STAC item for a JRC-GSW dataset.
@@ -62,9 +58,24 @@ def create_item(
     if not read_href_modifier:
         read_href_modifier = lambda x: x
 
+    agg_types = [
+        "change",
+        "extent",
+        "occurrence",
+        "recurrence",
+        "seasonality",
+        "transitions",
+    ]
+
+    agg_hrefs = {}
+    for agg_type in agg_types:
+        agg_hrefs[
+            agg_type
+        ] = f"{source}/Aggregated/{DATA_VERSION}/{agg_type}/tiles/{agg_type}-{tile_id}.tif"  # noqa
+
     # Gather information from one of the tiffs as they are
     # all the same.
-    with rio.open(read_href_modifier(change_href)) as ds:
+    with rio.open(read_href_modifier(agg_hrefs["change"])) as ds:
         image_shape = list(ds.shape)
         original_bbox = list(ds.bounds)
         transform = list(ds.transform)
@@ -72,14 +83,7 @@ def create_item(
             ds.crs, "epsg:4326", mapping(box(*ds.bounds)), precision=6
         )
 
-    # Get ID, e.g. 0E_40Nv1_3_2020
-    m = re.match(ID_REGEX, change_href)
-    if not m:
-        raise UnexpectedPathError(
-            f"{change_href} does not fit stactool's expected format"
-        )
-
-    item_id = m.group(1)
+    item_id = tile_id
     bbox = list(shape(geom).bounds)
 
     start_datetime = START_TIME
@@ -110,13 +114,14 @@ def create_item(
     scientific.doi = DOI
     scientific.citation = CITATION
 
+    # Create Aggregation assets
     for key, href in [
-        (SEASONALITY_KEY, seasonality_href),
-        (OCCURRENCE_KEY, occurrence_href),
-        (CHANGE_KEY, change_href),
-        (RECURRENCE_KEY, recurrence_href),
-        (TRANSITIONS_KEY, transitions_href),
-        (EXTENT_KEY, extent_href),
+        (SEASONALITY_KEY, agg_hrefs["seasonality"]),
+        (OCCURRENCE_KEY, agg_hrefs["occurrence"]),
+        (CHANGE_KEY, agg_hrefs["change"]),
+        (RECURRENCE_KEY, agg_hrefs["recurrence"]),
+        (TRANSITIONS_KEY, agg_hrefs["transitions"]),
+        (EXTENT_KEY, agg_hrefs["extent"]),
     ]:
         item.add_asset(key, ITEM_ASSETS[key].create_asset(href))
 
