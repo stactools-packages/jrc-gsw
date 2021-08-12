@@ -78,16 +78,25 @@ def create_jrc_gsw_command(cli):
         "-s",
         "--source",
         required=True,
-        help="The input COG to create the item from.",
+        help="The root data directory.",
     )
-    def create_item_command(destination: str, source: str):
+    @click.option(
+        "-t",
+        "--tile_id",
+        required=True,
+        help="The tile ID to process.",
+    )
+    def create_item_command(destination: str, source: str, tile_id: str):
         """Creates a STAC Item
 
         Args:
             destination (str): The output directory for the STAC json.
-            source (str): The input COG to create the item from.
+            source (str): The root data directory. Must follow the
+                          structure found in:
+                          http://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/GSWE/
+            tile_id (str): The tile ID to process.
         """
-        item = stac.create_item(source)
+        item = stac.create_item(source, tile_id)
         item_path = os.path.join(destination, f"{item.id}.json")
         item.set_self_href(item_path)
         item.save_object()

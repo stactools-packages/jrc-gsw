@@ -17,8 +17,7 @@ JRC_GSW_PROVIDER = pystac.Provider(
     url="https://global-surface-water.appspot.com/",
 )
 
-# Regex to extract IDs out of file names
-ID_REGEX = re.compile(r".*_(\d+(E|W)_\d+(N|S)v\d_\d_\d+).*")
+DATA_VERSION = "VER4-0"
 
 # The overall start and end datetime for this collection.
 START_TIME = str_to_datetime("1984-03-01T00:00:00Z")
