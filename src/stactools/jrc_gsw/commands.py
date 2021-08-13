@@ -3,15 +3,6 @@ import click
 import logging
 
 from stactools.jrc_gsw import stac
-from stactools.jrc_gsw.constants import (
-    CORE_JSC_GSW,
-    OCCURRENCE,
-    CHANGE,
-    SEASONALITY,
-    RECURRENCE,
-    TRANSITIONS,
-    EXTENT,
-)
 
 logger = logging.getLogger(__name__)
 
@@ -45,20 +36,7 @@ def create_jrc_gsw_command(cli):
         Returns:
             Callable
         """
-        root_col = stac.create_collection(CORE_JSC_GSW)
-        occurrence_col = stac.create_collection(OCCURRENCE)
-        change_col = stac.create_collection(CHANGE)
-        seasonality_col = stac.create_collection(SEASONALITY)
-        recurrence_col = stac.create_collection(RECURRENCE)
-        transitions_col = stac.create_collection(TRANSITIONS)
-        extent_col = stac.create_collection(EXTENT)
-
-        root_col.add_child(occurrence_col)
-        root_col.add_child(change_col)
-        root_col.add_child(seasonality_col)
-        root_col.add_child(recurrence_col)
-        root_col.add_child(transitions_col)
-        root_col.add_child(extent_col)
+        root_col = stac.create_collection()
 
         root_col.normalize_hrefs(destination)
         root_col.save()
@@ -86,7 +64,21 @@ def create_jrc_gsw_command(cli):
         required=True,
         help="The tile ID to process.",
     )
-    def create_item_command(destination: str, source: str, tile_id: str):
+    @click.option(
+        "-y",
+        "--year",
+        required=True,
+        help="Year to process.",
+    )
+    @click.option(
+        "-m",
+        "--month",
+        required=True,
+        help="Month to process.",
+    )
+    def create_item_command(
+        destination: str, source: str, tile_id: str, year: int, month: int
+    ):
         """Creates a STAC Item
 
         Args:
@@ -95,8 +87,10 @@ def create_jrc_gsw_command(cli):
                           structure found in:
                           http://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/GSWE/
             tile_id (str): The tile ID to process.
+            year (int): Year to process.
+            month (int): Month to process.
         """
-        item = stac.create_item(source, tile_id)
+        item = stac.create_item(source, tile_id, year, month)
         item_path = os.path.join(destination, f"{item.id}.json")
         item.set_self_href(item_path)
         item.save_object()
