@@ -10,14 +10,29 @@ class TestSTAC(unittest.TestCase):
         args = {
             "source": test_data.get_path("data-files"),
             "tile_id": "0000360000-0000480000",
+            "year": 1984,
+            "month": 4,
         }
 
         item = create_item(**args)
 
-        self.assertEqual(item.id, args["tile_id"])
+        self.assertEqual(
+            item.id, f'{args["tile_id"]}_{args["year"]}_{str(args["month"]).zfill(2)}'
+        )
+
+        agg_types = [
+            "change",
+            "extent",
+            "occurrence",
+            "recurrence",
+            "seasonality",
+            "transitions",
+        ]
 
         for key, asset in item.assets.items():
-            self.assertIn(key, asset.href)
+            if key in agg_types:
+                self.assertIn(key, asset.href)
+            self.assertIn(args["tile_id"], asset.href)
 
         item.validate()
 

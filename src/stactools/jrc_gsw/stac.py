@@ -1,7 +1,9 @@
+from dateutil.relativedelta import relativedelta
 from typing import Optional
 
 from pystac.common_metadata import CommonMetadata
 from pystac.extensions.item_assets import ItemAssetsExtension
+from pystac.utils import str_to_datetime
 import logging
 
 import rasterio as rio
@@ -20,6 +22,10 @@ from stactools.jrc_gsw.assets import (
     RECURRENCE_KEY,
     SEASONALITY_KEY,
     TRANSITIONS_KEY,
+    MONTHLY_HISTORY_KEY,
+    MONTHLY_RECURRENCE_KEY,
+    MONTHLY_RECURRENCE_OBSERVATIONS_KEY,
+    YEARLY_CLASSIFICATION_KEY,
 )
 
 from stactools.jrc_gsw.constants import (
@@ -48,6 +54,8 @@ class UnexpectedPathError(Exception):
 def create_item(
     source: str,
     tile_id: str,
+    year: int,
+    month: int,
     read_href_modifier: Optional[ReadHrefModifier] = None,
 ) -> pystac.Item:
     """Creates a STAC item for a JRC-GSW dataset.
@@ -83,11 +91,13 @@ def create_item(
             ds.crs, "epsg:4326", mapping(box(*ds.bounds)), precision=6
         )
 
-    item_id = tile_id
+    month_zfill = str(month).zfill(2)
+
+    item_id = f"{tile_id}_{year}_{month_zfill}"
     bbox = list(shape(geom).bounds)
 
-    start_datetime = START_TIME
-    end_datetime = END_TIME
+    start_datetime = str_to_datetime(f"{year}-{month_zfill}-01T00:00:00Z")
+    end_datetime = start_datetime + relativedelta(months=1)
 
     # Create item
     item = pystac.Item(
@@ -101,8 +111,8 @@ def create_item(
         },
     )
 
-    item.common_metadata.start_datetime = START_TIME
-    item.common_metadata.end_datetime = END_TIME
+    item.common_metadata.start_datetime = start_datetime
+    item.common_metadata.end_datetime = end_datetime
 
     projection = ProjectionExtension.ext(item, add_if_missing=True)
     projection.epsg = EPSG
@@ -130,6 +140,41 @@ def create_item(
     seasonality_common_metadata.start_datetime = SEASONALITY_START_TIME
     # JSON validation Requires that we also set end time
     seasonality_common_metadata.end_datetime = END_TIME
+
+    # Create Monthly History asset
+    monthly_history_root = f"{source}/MonthlyHistory/{DATA_VERSION}/tiles"
+    monthly_history_href = f"{monthly_history_root}/{year}/{year}_{month_zfill}/{year}_{month_zfill}-{tile_id}.tif"  # noqa
+    item.add_asset(
+        MONTHLY_HISTORY_KEY,
+        ITEM_ASSETS[MONTHLY_HISTORY_KEY].create_asset(monthly_history_href),
+    )
+
+    # Create Monthly Recurrence assets
+    monthly_recurrence_root = f"{source}/MonthlyRecurrence/{DATA_VERSION}/tiles"
+    monthly_recurrence_href = (
+        f"{monthly_recurrence_root}/monthlyRecurrence{month}/{tile_id}.tif"  # noqa
+    )
+    item.add_asset(
+        MONTHLY_RECURRENCE_KEY,
+        ITEM_ASSETS[MONTHLY_RECURRENCE_KEY].create_asset(monthly_recurrence_href),
+    )
+
+    monthly_recurrence_observations_href = (
+        f"{monthly_recurrence_root}/has_observations{month}/{tile_id}.tif"  # noqa
+    )
+    item.add_asset(
+        MONTHLY_RECURRENCE_OBSERVATIONS_KEY,
+        ITEM_ASSETS[MONTHLY_RECURRENCE_OBSERVATIONS_KEY].create_asset(
+            monthly_recurrence_observations_href
+        ),
+    )
+
+    # Create Yearly Classification asset
+    yearly_classification_href = f"{source}/YearlyClassification/{DATA_VERSION}/tiles/yearlyClassification{year}/yearlyClassification{year}-{tile_id}.tif"  # noqa
+    item.add_asset(
+        YEARLY_CLASSIFICATION_KEY,
+        ITEM_ASSETS[YEARLY_CLASSIFICATION_KEY].create_asset(yearly_classification_href),
+    )
 
     return item
 
