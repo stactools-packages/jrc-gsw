@@ -9,8 +9,7 @@
   - [Scientific](https://github.com/stac-extensions/scientific/)
   - [Projection](https://github.com/stac-extensions/projection/)
 
-
-Global surface water products from the European Commission Joint Research Centre, based on Landsat 5, 7, and 8 imagery.  Layers in this collection describe the occurrence, change, and seasonality of surface water from 1984-2020.
+Global surface water products from the European Commission Joint Research Centre, based on Landsat 5, 7, and 8 imagery. Layers in this collection describe the occurrence, change, and seasonality of surface water from 1984-2020.
 
 ## Usage
 
@@ -20,10 +19,15 @@ Global surface water products from the European Commission Joint Research Centre
 from stactools.jrc_gsw import stac, constants
 
 # Create a STAC Collection
-stac.create_collection(constants.CORE_JSC_GSW)
+stac.create_collection()
 
 # Create a STAC Item
-stac.create_item("/path/to/cog.tif")
+stac.create_item(
+  source="/path/to/GSWE_data_directory",
+  tile_id="0000360000-0000480000",
+  year=1984,
+  month=4
+)
 ```
 
 2. Using the CLI
@@ -32,6 +36,6 @@ stac.create_item("/path/to/cog.tif")
 # STAC Collection
 stac jrc-gsw create-collection -d "/path/to/output/directory"
 
-# Create a STAC Item 
-stac jrc-gsw create-item -d "/path/to/output/directory" -s "/path/to/input/cog.tiff"
+# Create a STAC Item
+stac jrc-gsw create-item -d "/path/to/output/directory" -s "/path/to/GSWE_data_directory" -t "0000360000-0000480000" -y 1984 -m 4
 ```
