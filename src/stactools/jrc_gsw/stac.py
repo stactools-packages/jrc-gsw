@@ -1,17 +1,18 @@
 from dateutil.relativedelta import relativedelta
 from typing import Optional
 
-from pystac.common_metadata import CommonMetadata
-from pystac.extensions.item_assets import ItemAssetsExtension
-from pystac.utils import str_to_datetime
 import logging
 
 import rasterio as rio
 from shapely.geometry import box, mapping, shape
 import pystac
 from pystac.asset import Asset
+from pystac.common_metadata import CommonMetadata
+from pystac.extensions.item_assets import ItemAssetsExtension
 from pystac.extensions.scientific import ScientificExtension
 from pystac.extensions.projection import ProjectionExtension
+from pystac.extensions.version import ItemVersionExtension
+from pystac.utils import str_to_datetime
 from stactools.core.io import ReadHrefModifier
 from stactools.core.projection import reproject_geom
 from stactools.jrc_gsw.assets import (
@@ -33,11 +34,12 @@ from stactools.jrc_gsw.constants import (
     COLLECTION_DESCRIPTION,
     COLLECTION_ID,
     COLLECTION_TITLE,
-    DATA_VERSION,
+    DOWNLOAD_VERSION,
     DOI,
     END_TIME,
     EPSG,
     JRC_GSW_PROVIDER,
+    LATEST_VERSION,
     LICENSE,
     SEASONALITY_START_TIME,
     SPATIAL_EXTENT,
@@ -63,6 +65,7 @@ def create_item(
     Returns:
         pystac.Item: STAC Item object.
     """
+
     if not read_href_modifier:
         read_href_modifier = lambda x: x
 
@@ -79,7 +82,7 @@ def create_item(
     for agg_type in agg_types:
         agg_hrefs[
             agg_type
-        ] = f"{source}/Aggregated/{DATA_VERSION}/{agg_type}/tiles/{agg_type}-{tile_id}.tif"  # noqa
+        ] = f"{source}/Aggregated/{DOWNLOAD_VERSION}/{agg_type}/tiles/{agg_type}-{tile_id}.tif"  # noqa
 
     # Gather information from one of the tiffs as they are
     # all the same.
@@ -124,6 +127,9 @@ def create_item(
     scientific.doi = DOI
     scientific.citation = CITATION
 
+    version = ItemVersionExtension.ext(item, add_if_missing=True)
+    version.version = LATEST_VERSION
+
     # Create Aggregation assets
     for key, href in [
         (SEASONALITY_KEY, agg_hrefs["seasonality"]),
@@ -142,7 +148,7 @@ def create_item(
     seasonality_common_metadata.end_datetime = END_TIME
 
     # Create Monthly History asset
-    monthly_history_root = f"{source}/MonthlyHistory/{DATA_VERSION}/tiles"
+    monthly_history_root = f"{source}/MonthlyHistory/{DOWNLOAD_VERSION}/tiles"
     monthly_history_href = f"{monthly_history_root}/{year}/{year}_{month_zfill}/{year}_{month_zfill}-{tile_id}.tif"  # noqa
     item.add_asset(
         MONTHLY_HISTORY_KEY,
@@ -150,7 +156,7 @@ def create_item(
     )
 
     # Create Monthly Recurrence assets
-    monthly_recurrence_root = f"{source}/MonthlyRecurrence/{DATA_VERSION}/tiles"
+    monthly_recurrence_root = f"{source}/MonthlyRecurrence/{DOWNLOAD_VERSION}/tiles"
     monthly_recurrence_href = (
         f"{monthly_recurrence_root}/monthlyRecurrence{month}/{tile_id}.tif"  # noqa
     )
@@ -170,7 +176,7 @@ def create_item(
     )
 
     # Create Yearly Classification asset
-    yearly_classification_href = f"{source}/YearlyClassification/{DATA_VERSION}/tiles/yearlyClassification{year}/yearlyClassification{year}-{tile_id}.tif"  # noqa
+    yearly_classification_href = f"{source}/YearlyClassification/{DOWNLOAD_VERSION}/tiles/yearlyClassification{year}/yearlyClassification{year}-{tile_id}.tif"  # noqa
     item.add_asset(
         YEARLY_CLASSIFICATION_KEY,
         ITEM_ASSETS[YEARLY_CLASSIFICATION_KEY].create_asset(yearly_classification_href),
