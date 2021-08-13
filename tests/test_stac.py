@@ -34,6 +34,10 @@ class TestSTAC(unittest.TestCase):
                 self.assertIn(key, asset.href)
             self.assertIn(args["tile_id"], asset.href)
 
+        self.assertEqual(len(item.stac_extensions), 3)
+
+        self.assertIn("version", item.properties.keys())
+
         item.validate()
 
     def test_create_collection(self):
