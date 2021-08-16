@@ -1,5 +1,6 @@
 from dateutil.relativedelta import relativedelta
 from typing import Optional
+from os import path
 
 import logging
 
@@ -80,9 +81,10 @@ def create_item(
 
     agg_hrefs = {}
     for agg_type in agg_types:
-        agg_hrefs[
-            agg_type
-        ] = f"{source}/Aggregated/{DOWNLOAD_VERSION}/{agg_type}/tiles/{agg_type}-{tile_id}.tif"  # noqa
+        agg_hrefs[agg_type] = path.join(
+            source,
+            f"Aggregated/{DOWNLOAD_VERSION}/{agg_type}/tiles/{agg_type}-{tile_id}.tif",
+        )  # noqa
 
     # Gather information from one of the tiffs as they are
     # all the same.
