@@ -150,7 +150,7 @@ def create_item(
     seasonality_common_metadata.end_datetime = END_TIME
 
     # Create Monthly History asset
-    monthly_history_root = f"{source}/MonthlyHistory/{DOWNLOAD_VERSION}/tiles"
+    monthly_history_root = path.join(source, "MonthlyHistory/{DOWNLOAD_VERSION}/tiles")
     monthly_history_href = f"{monthly_history_root}/{year}/{year}_{month_zfill}/{year}_{month_zfill}-{tile_id}.tif"  # noqa
     item.add_asset(
         MONTHLY_HISTORY_KEY,
@@ -158,7 +158,9 @@ def create_item(
     )
 
     # Create Monthly Recurrence assets
-    monthly_recurrence_root = f"{source}/MonthlyRecurrence/{DOWNLOAD_VERSION}/tiles"
+    monthly_recurrence_root = path.join(
+        source, "MonthlyRecurrence/{DOWNLOAD_VERSION}/tiles"
+    )
     monthly_recurrence_href = (
         f"{monthly_recurrence_root}/monthlyRecurrence{month}/{tile_id}.tif"  # noqa
     )
@@ -178,7 +180,10 @@ def create_item(
     )
 
     # Create Yearly Classification asset
-    yearly_classification_href = f"{source}/YearlyClassification/{DOWNLOAD_VERSION}/tiles/yearlyClassification{year}/yearlyClassification{year}-{tile_id}.tif"  # noqa
+    yearly_classification_href = path.join(
+        source,
+        "YearlyClassification/{DOWNLOAD_VERSION}/tiles/yearlyClassification{year}/yearlyClassification{year}-{tile_id}.tif",  # noqa
+    )
     item.add_asset(
         YEARLY_CLASSIFICATION_KEY,
         ITEM_ASSETS[YEARLY_CLASSIFICATION_KEY].create_asset(yearly_classification_href),
