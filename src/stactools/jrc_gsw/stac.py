@@ -83,8 +83,12 @@ def create_item(
     for agg_type in agg_types:
         agg_hrefs[agg_type] = path.join(
             source,
-            f"Aggregated/{DOWNLOAD_VERSION}/{agg_type}/tiles/{agg_type}-{tile_id}.tif",
-        )  # noqa
+            "Aggregated",
+            DOWNLOAD_VERSION,
+            agg_type,
+            "tiles",
+            f"{agg_type}-{tile_id}.tif",
+        )
 
     # Gather information from one of the tiffs as they are
     # all the same.
@@ -150,8 +154,15 @@ def create_item(
     seasonality_common_metadata.end_datetime = END_TIME
 
     # Create Monthly History asset
-    monthly_history_root = path.join(source, f"MonthlyHistory/{DOWNLOAD_VERSION}/tiles")
-    monthly_history_href = f"{monthly_history_root}/{year}/{year}_{month_zfill}/{year}_{month_zfill}-{tile_id}.tif"  # noqa
+    monthly_history_root = path.join(
+        source, "MonthlyHistory", DOWNLOAD_VERSION, "tiles"
+    )
+    monthly_history_href = path.join(
+        monthly_history_root,
+        year,
+        f"{year}_{month_zfill}",
+        f"{year}_{month_zfill}-{tile_id}.tif",
+    )
     item.add_asset(
         MONTHLY_HISTORY_KEY,
         ITEM_ASSETS[MONTHLY_HISTORY_KEY].create_asset(monthly_history_href),
@@ -159,18 +170,18 @@ def create_item(
 
     # Create Monthly Recurrence assets
     monthly_recurrence_root = path.join(
-        source, f"MonthlyRecurrence/{DOWNLOAD_VERSION}/tiles"
+        source, "MonthlyRecurrence", DOWNLOAD_VERSION, "tiles"
     )
-    monthly_recurrence_href = (
-        f"{monthly_recurrence_root}/monthlyRecurrence{month}/{tile_id}.tif"  # noqa
+    monthly_recurrence_href = path.join(
+        monthly_recurrence_root, f"monthlyRecurrence{month}", f"{tile_id}.tif"
     )
     item.add_asset(
         MONTHLY_RECURRENCE_KEY,
         ITEM_ASSETS[MONTHLY_RECURRENCE_KEY].create_asset(monthly_recurrence_href),
     )
 
-    monthly_recurrence_observations_href = (
-        f"{monthly_recurrence_root}/has_observations{month}/{tile_id}.tif"  # noqa
+    monthly_recurrence_observations_href = path.join(
+        monthly_recurrence_root, f"has_observations{month}", f"{tile_id}.tif"
     )
     item.add_asset(
         MONTHLY_RECURRENCE_OBSERVATIONS_KEY,
@@ -182,7 +193,11 @@ def create_item(
     # Create Yearly Classification asset
     yearly_classification_href = path.join(
         source,
-        f"YearlyClassification/{DOWNLOAD_VERSION}/tiles/yearlyClassification{year}/yearlyClassification{year}-{tile_id}.tif",  # noqa
+        "YearlyClassification",
+        DOWNLOAD_VERSION,
+        "tiles",
+        f"yearlyClassification{year}",
+        f"yearlyClassification{year}-{tile_id}.tif",
     )
     item.add_asset(
         YEARLY_CLASSIFICATION_KEY,
