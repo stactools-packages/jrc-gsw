@@ -159,7 +159,7 @@ def create_item(
     )
     monthly_history_href = path.join(
         monthly_history_root,
-        year,
+        str(year),
         f"{year}_{month_zfill}",
         f"{year}_{month_zfill}-{tile_id}.tif",
     )
