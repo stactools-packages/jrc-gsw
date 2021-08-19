@@ -140,6 +140,7 @@ def create_item(
 
     elif collection_name == "MonthlyRecurrence":
         month = os.path.dirname(source.split("monthlyRecurrence")[1])
+        item_id += f"_{str(month).zfill(2)}"
 
         start_datetime = START_TIME
         end_datetime = END_TIME
@@ -149,19 +150,20 @@ def create_item(
         }
 
         if "monthlyRecurrence" in source:
-            parent_dir = os.path.dirname(source.split("monthlyRecurrence")[0])
+            recurrence_href = source
+            observations_href = source.replace("monthlyRecurrence", "has_observations")
         else:
-            parent_dir = os.path.dirname(source.split("has_observations")[0])
+            observations_href = source
+            recurrence_href = source.replace("has_observations", "monthlyRecurrence")
 
-        asset_types = ["monthlyRecurrence", "has_observations"]
+        asset_types = {
+            "monthlyRecurrence": recurrence_href,
+            "has_observations": observations_href,
+        }
 
-        for i in range(12):
-            for asset_type in asset_types:
-                asset_key = f"{asset_type}{i+1}"
-                href = os.path.join(parent_dir, asset_key, f"{item_id}.tif")
-                assets[asset_key] = ITEM_ASSETS[MONTHLY_RECURRENCE["ID"]][
-                    asset_key
-                ].create_asset(href)
+        for k, v in asset_types.items():
+            href = v
+            assets[k] = ITEM_ASSETS[MONTHLY_RECURRENCE["ID"]][k].create_asset(v)
 
     elif collection_name == "YearlyClassification":
         year = os.path.dirname(source.split("yearlyClassification")[1])
