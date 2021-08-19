@@ -1,4 +1,3 @@
-from datetime import datetime
 from typing import Dict
 import pystac
 from pystac.extensions.item_assets import AssetDefinition
@@ -101,6 +100,28 @@ ITEM_ASSETS: Dict[str, AssetDefinition] = {
             }
         )
     },
+    MONTHLY_RECURRENCE["ID"]: {
+        MONTHLY_RECURRENCE_KEY: AssetDefinition(
+            {
+                "title": "Monthly Recurrence",
+                "description": (
+                    "Monthly measures of the seasonality of water based on the occurrence values detected in that month over all years."  # noqa
+                ),
+                "type": pystac.MediaType.COG,
+                "roles": ["data"],
+            }
+        ),
+        MONTHLY_RECURRENCE_OBSERVATIONS_KEY: AssetDefinition(
+            {
+                "title": "Monthly Recurrence Observations",
+                "description": (
+                    "Binary indicator of presence of seasonal water based on the occurrence values detected in that month over all years."  # noqa
+                ),
+                "type": pystac.MediaType.COG,
+                "roles": ["data"],
+            }
+        ),
+    },
     YEARLY_CLASSIFICATION["ID"]: {
         YEARLY_CLASSIFICATION_KEY: AssetDefinition(
             {
@@ -114,32 +135,3 @@ ITEM_ASSETS: Dict[str, AssetDefinition] = {
         ),
     },
 }
-
-MONTHLY_RECURRENCE_ASSETS = {}
-for i in range(1, 13):
-    month_name = datetime.strptime(str(i), "%m").strftime("%B")
-    MONTHLY_RECURRENCE_ASSETS[f"{MONTHLY_RECURRENCE_KEY}{i}"] = AssetDefinition(
-        {
-            "title": f"Monthly Recurrence ({month_name})",
-            "description": (
-                "Monthly measures of the seasonality of water based on the occurrence values detected in that month over all years."  # noqa
-            ),
-            "type": pystac.MediaType.COG,
-            "roles": ["data"],
-        }
-    )
-
-    MONTHLY_RECURRENCE_ASSETS[
-        f"{MONTHLY_RECURRENCE_OBSERVATIONS_KEY}{i}"
-    ] = AssetDefinition(
-        {
-            "title": f"Monthly Recurrence Observations ({month_name})",
-            "description": (
-                "Binary indicator of presence of seasonal water based on the occurrence values detected in that month over all years."  # noqa
-            ),
-            "type": pystac.MediaType.COG,
-            "roles": ["data"],
-        }
-    )
-
-ITEM_ASSETS[MONTHLY_RECURRENCE["ID"]] = MONTHLY_RECURRENCE_ASSETS

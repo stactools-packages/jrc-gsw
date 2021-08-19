@@ -77,12 +77,12 @@ class TestSTAC(unittest.TestCase):
 
         item = create_item(**args)
 
-        self.assertEqual(item.id, item_id)
+        self.assertEqual(item.id, f"{item_id}_{month}")
 
         for key, asset in item.assets.items():
-            self.assertTrue("monthlyRecurrence" in key or "has_observations" in key)
+            self.assertTrue("monthlyRecurrence" == key or "has_observations" == key)
 
-        self.assertEqual(len(item.assets), 24)
+        self.assertEqual(len(item.assets), 2)
         self.assertEqual(len(item.stac_extensions), 3)
         self.assertIn("version", item.properties.keys())
         item.validate()
