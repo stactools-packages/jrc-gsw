@@ -35,7 +35,7 @@ class TestSTAC(unittest.TestCase):
             if key in agg_types:
                 self.assertIn(key, asset.href)
             self.assertIn(tile_id, asset.href)
-        self.assertEqual(len(item.stac_extensions), 4)
+        self.assertEqual(len(item.stac_extensions), 5)
         self.assertIn("version", item.properties.keys())
         item.validate()
 
@@ -62,7 +62,7 @@ class TestSTAC(unittest.TestCase):
         self.assertEqual(item.properties["end_datetime"], datetime_to_str(end_datetime))
 
         self.assertIn("monthly-history", item.assets.keys())
-        self.assertEqual(len(item.stac_extensions), 4)
+        self.assertEqual(len(item.stac_extensions), 5)
         self.assertIn("version", item.properties.keys())
         item.validate()
 
@@ -83,7 +83,7 @@ class TestSTAC(unittest.TestCase):
             self.assertTrue("monthlyRecurrence" == key or "has_observations" == key)
 
         self.assertEqual(len(item.assets), 2)
-        self.assertEqual(len(item.stac_extensions), 4)
+        self.assertEqual(len(item.stac_extensions), 5)
         self.assertIn("version", item.properties.keys())
         item.validate()
 
@@ -101,13 +101,9 @@ class TestSTAC(unittest.TestCase):
         self.assertEqual(item.id, f"{tile_id}_{year}")
 
         self.assertEqual(len(item.assets), 1)
-        self.assertEqual(len(item.stac_extensions), 4)
+        self.assertEqual(len(item.stac_extensions), 5)
         self.assertIn("version", item.properties.keys())
         item.validate()
-
-        import json
-
-        print(json.dumps(item.to_dict()))
 
     def test_create_collection(self):
         collection = create_collection(AGGREGATED)

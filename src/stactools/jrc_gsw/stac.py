@@ -1,14 +1,16 @@
-from dateutil.relativedelta import relativedelta
-import os.path
-from typing import Optional
-
+import fsspec
 import logging
+import os.path
+
+from dateutil.relativedelta import relativedelta
+from typing import Optional
 
 import rasterio as rio
 from shapely.geometry import box, mapping, shape
 
 import pystac
 from pystac.asset import Asset
+from pystac.extensions.file import FileExtension
 from pystac.extensions.item_assets import AssetDefinition, ItemAssetsExtension
 from pystac.extensions.scientific import ScientificExtension
 from pystac.extensions.projection import ProjectionExtension
@@ -75,6 +77,11 @@ def collect_raster_stats(href: str) -> dict:
                 )
             )
         raster_stats["bands"] = raster_bands
+
+    with fsspec.open(href) as file:
+        size = file.size
+        if size is not None:
+            raster_stats["size"] = size
 
     return raster_stats
 
@@ -220,6 +227,9 @@ def create_item(
     for k, v in assets.items():
         asset = v["asset_defn"]
         item.add_asset(k, asset)
+
+        file_ext = FileExtension.ext(asset, add_if_missing=True)
+        file_ext.size = v["raster_stats"]["size"]
 
         raster = RasterExtension.ext(asset, add_if_missing=True)
         raster.bands = v["raster_stats"]["bands"]
