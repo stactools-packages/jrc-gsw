@@ -9,9 +9,10 @@ from shapely.geometry import box, mapping, shape
 
 import pystac
 from pystac.asset import Asset
-from pystac.extensions.item_assets import ItemAssetsExtension
+from pystac.extensions.item_assets import AssetDefinition, ItemAssetsExtension
 from pystac.extensions.scientific import ScientificExtension
 from pystac.extensions.projection import ProjectionExtension
+from pystac.extensions.raster import RasterBand, RasterExtension
 from pystac.extensions.version import ItemVersionExtension
 from pystac.utils import str_to_datetime, datetime_to_str
 
@@ -54,6 +55,39 @@ class UnexpectedPathError(Exception):
     pass
 
 
+def collect_raster_stats(href: str) -> dict:
+    raster_stats = {}
+    with rio.open(href) as ds:
+        raster_stats["shape"] = list(ds.shape)
+        raster_stats["transform"] = list(ds.transform)
+        raster_stats["geometry"] = reproject_geom(
+            ds.crs, "epsg:4326", mapping(box(*ds.bounds)), precision=6
+        )
+        raster_stats["proj_bbox"] = list(shape(raster_stats["geometry"]).bounds)
+        raster_stats["orig_bbox"] = list(ds.bounds)
+
+        raster_bands = []
+        for i in range(ds.count):
+            raster_bands.append(
+                RasterBand.create(
+                    data_type=ds.dtypes[i],
+                    sampling=ds.tags().get("AREA_OR_POINT").lower(),
+                )
+            )
+        raster_stats["bands"] = raster_bands
+
+    return raster_stats
+
+
+def assemble_asset(asset_defn: AssetDefinition, href: str) -> dict:
+    raster_stats = collect_raster_stats(href)
+
+    return {
+        "asset_defn": asset_defn.create_asset(href),
+        "raster_stats": raster_stats,
+    }
+
+
 def create_item(
     source: str,
     read_href_modifier: Optional[ReadHrefModifier] = None,
@@ -77,15 +111,6 @@ def create_item(
     item_id = os.path.splitext("-".join(os.path.basename(source).split("-")[-2:]))[0]
 
     root_path = os.path.dirname(source.split(collection_name)[0])
-
-    with rio.open(read_href_modifier(source)) as ds:
-        image_shape = list(ds.shape)
-        original_bbox = list(ds.bounds)
-        transform = list(ds.transform)
-        geometry = reproject_geom(
-            ds.crs, "epsg:4326", mapping(box(*ds.bounds)), precision=6
-        )
-        bbox = list(shape(geometry).bounds)
 
     assets = {}
 
@@ -120,12 +145,14 @@ def create_item(
             (TRANSITIONS_KEY, agg_hrefs["transitions"]),
             (EXTENT_KEY, agg_hrefs["extent"]),
         ]:
-            assets[key] = ITEM_ASSETS[AGGREGATED["ID"]][key].create_asset(href)
+            assets[key] = assemble_asset(ITEM_ASSETS[AGGREGATED["ID"]][key], href)
 
     elif collection_name == "MonthlyHistory":
         year_month = os.path.basename(source).split("-")[0].split("_")
         year = year_month[0]
         month = year_month[1]
+
+        item_id += f"_{year}_{month}"
 
         start_datetime = str_to_datetime(f"{year}-{month}-01T00:00:00Z")
         end_datetime = start_datetime + relativedelta(months=1)
@@ -134,9 +161,9 @@ def create_item(
             "end_datetime": datetime_to_str(end_datetime),
         }
 
-        assets[MONTHLY_HISTORY_KEY] = ITEM_ASSETS[MONTHLY_HISTORY["ID"]][
-            MONTHLY_HISTORY_KEY
-        ].create_asset(source)
+        assets[MONTHLY_HISTORY_KEY] = assemble_asset(
+            ITEM_ASSETS[MONTHLY_HISTORY["ID"]][MONTHLY_HISTORY_KEY], source
+        )
 
     elif collection_name == "MonthlyRecurrence":
         month = os.path.dirname(source.split("monthlyRecurrence")[1])
@@ -162,11 +189,11 @@ def create_item(
         }
 
         for k, v in asset_types.items():
-            href = v
-            assets[k] = ITEM_ASSETS[MONTHLY_RECURRENCE["ID"]][k].create_asset(v)
+            assets[k] = assemble_asset(ITEM_ASSETS[MONTHLY_RECURRENCE["ID"]][k], v)
 
     elif collection_name == "YearlyClassification":
         year = os.path.dirname(source.split("yearlyClassification")[1])
+        item_id += f"_{year}"
 
         start_datetime = str_to_datetime(f"{year}-01-01T00:00:00Z")
         end_datetime = start_datetime + relativedelta(years=1)
@@ -175,26 +202,33 @@ def create_item(
             "end_datetime": datetime_to_str(end_datetime),
         }
 
-        assets[YEARLY_CLASSIFICATION_KEY] = ITEM_ASSETS[YEARLY_CLASSIFICATION["ID"]][
-            YEARLY_CLASSIFICATION_KEY
-        ].create_asset(source)
+        assets[YEARLY_CLASSIFICATION_KEY] = assemble_asset(
+            ITEM_ASSETS[YEARLY_CLASSIFICATION["ID"]][YEARLY_CLASSIFICATION_KEY], source
+        )
+
+    first_asset_key = list(assets.keys())[0]
+    raster_stats = assets[first_asset_key]["raster_stats"]
 
     item = pystac.Item(
         id=item_id,
-        geometry=geometry,
-        bbox=bbox,
+        geometry=raster_stats["geometry"],
+        bbox=raster_stats["orig_bbox"],
         datetime=None,
         properties=properties,
     )
 
     for k, v in assets.items():
-        item.add_asset(k, v)
+        asset = v["asset_defn"]
+        item.add_asset(k, asset)
+
+        raster = RasterExtension.ext(asset, add_if_missing=True)
+        raster.bands = v["raster_stats"]["bands"]
 
     projection = ProjectionExtension.ext(item, add_if_missing=True)
     projection.epsg = EPSG
-    projection.bbox = original_bbox
-    projection.shape = image_shape
-    projection.transform = transform[:6]
+    projection.bbox = raster_stats["proj_bbox"]
+    projection.shape = raster_stats["shape"]
+    projection.transform = raster_stats["transform"][:6]
 
     scientific = ScientificExtension.ext(item, add_if_missing=True)
     scientific.doi = DOI
