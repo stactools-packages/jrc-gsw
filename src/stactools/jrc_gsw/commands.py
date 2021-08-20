@@ -90,5 +90,6 @@ def create_jrc_gsw_command(cli):
         item_path = os.path.join(destination, f"{item.id}.json")
         item.set_self_href(item_path)
         item.save_object()
+        item.validate()
 
     return jrc_gsw
