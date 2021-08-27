@@ -16,17 +16,17 @@ Global surface water products from the European Commission Joint Research Centre
 1. As a python module
 
 ```python
-from stactools.jrc_gsw import stac, constants
+from stactools.jrc_gsw import stac, collections
+from pystac.utils import str_to_datetime
+
+collection_definition = collections.AGGREGATED
 
 # Create a STAC Collection
-stac.create_collection()
+stac.create_collection(collection_definition)
 
 # Create a STAC Item
 stac.create_item(
-  source="/path/to/GSWE_data_directory",
-  tile_id="0000360000-0000480000",
-  year=1984,
-  month=4
+  source="tests/data-files/Aggregated/LATEST/change/tiles/change-0000360000-0000480000.tif",
 )
 ```
 
@@ -34,8 +34,8 @@ stac.create_item(
 
 ```bash
 # STAC Collection
-stac jrc-gsw create-collection -d "/path/to/output/directory"
+stac jrc-gsw create-collection -d /tmp/collection_dir
 
 # Create a STAC Item
-stac jrc-gsw create-item -d "/path/to/output/directory" -s "/path/to/GSWE_data_directory" -t "0000360000-0000480000" -y 1984 -m 4
+stac jrc-gsw create-item -d /tmp/item_dir -s tests/data-files/Aggregated/LATEST/change/tiles/change-0000360000-0000480000.tif
 ```
