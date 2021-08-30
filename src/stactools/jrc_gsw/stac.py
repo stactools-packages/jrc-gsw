@@ -175,7 +175,15 @@ def create_item(
         )
 
     elif collection_name == "MonthlyRecurrence":
-        month = os.path.dirname(source.split("monthlyRecurrence")[1])
+        if "monthlyRecurrence" in source:
+            month = os.path.dirname(source.split("monthlyRecurrence")[1])
+            recurrence_href = source
+            observations_href = source.replace("monthlyRecurrence", "has_observations")
+        else:
+            month = os.path.dirname(source.split("has_observations")[1])
+            observations_href = source
+            recurrence_href = source.replace("has_observations", "monthlyRecurrence")
+
         item_id += f"_{str(month).zfill(2)}"
 
         start_datetime = START_TIME
@@ -184,13 +192,6 @@ def create_item(
             "start_datetime": datetime_to_str(start_datetime),
             "end_datetime": datetime_to_str(end_datetime),
         }
-
-        if "monthlyRecurrence" in source:
-            recurrence_href = source
-            observations_href = source.replace("monthlyRecurrence", "has_observations")
-        else:
-            observations_href = source
-            recurrence_href = source.replace("has_observations", "monthlyRecurrence")
 
         asset_types = {
             MONTHLY_RECURRENCE_KEY: recurrence_href,
