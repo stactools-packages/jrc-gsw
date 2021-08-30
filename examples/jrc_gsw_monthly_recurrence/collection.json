@@ -1,0 +1,89 @@
+{
+  "type": "Collection",
+  "id": "jrc_gsw_monthly_recurrence",
+  "stac_version": "1.0.0",
+  "description": "Monthly measures of the seasonality of water based on the occurrence values detected in that month over all years.",
+  "links": [
+    {
+      "rel": "root",
+      "href": "../collection.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "cite-as",
+      "href": "https://doi.org/10.1038/nature20584"
+    },
+    {
+      "rel": "parent",
+      "href": "../collection.json",
+      "type": "application/json"
+    }
+  ],
+  "stac_extensions": [
+    "https://stac-extensions.github.io/scientific/v1.0.0/schema.json",
+    "https://stac-extensions.github.io/item-assets/v1.0.0/schema.json"
+  ],
+  "sci:doi": "10.1038/nature20584",
+  "sci:citation": "Jean-Francois Pekel, Andrew Cottam, Noel Gorelick, Alan S. Belward, High-resolution mapping of global surface water and its long-term changes. Nature 540, 418-422 (2016)",
+  "item_assets": {
+    "monthly-recurrence": {
+      "title": "Monthly Recurrence",
+      "description": "Monthly measures of the seasonality of water based on the occurrence values detected in that month over all years.",
+      "type": "image/tiff; application=geotiff; profile=cloud-optimized",
+      "roles": [
+        "data"
+      ]
+    },
+    "monthly-recurrence-observations": {
+      "title": "Monthly Recurrence Observations",
+      "description": "Binary indicator of presence of seasonal water based on the occurrence values detected in that month over all years.",
+      "type": "image/tiff; application=geotiff; profile=cloud-optimized",
+      "roles": [
+        "data"
+      ]
+    }
+  },
+  "title": "European Commission Joint Research Centre - Global Surface Water (Monthly Recurrence)",
+  "extent": {
+    "spatial": {
+      "bbox": [
+        [
+          -180,
+          -56,
+          180,
+          78
+        ]
+      ]
+    },
+    "temporal": {
+      "interval": [
+        [
+          "1984-03-01T00:00:00Z",
+          "2020-12-31T11:59:59Z"
+        ]
+      ]
+    }
+  },
+  "license": "CC-BY-4.0",
+  "providers": [
+    {
+      "name": "European Commission Joint Research Centre",
+      "roles": [
+        "producer",
+        "processor"
+      ],
+      "url": "https://global-surface-water.appspot.com/"
+    }
+  ],
+  "assets": {
+    "guide": {
+      "href": "https://storage.cloud.google.com/global-surface-water/downloads_ancillary/DataUsersGuidev2020.pdf",
+      "type": "application/pdf",
+      "title": "User Guide",
+      "description": "Data users guide and description of the JRC GSW datasets.",
+      "roles": [
+        "metadata"
+      ]
+    }
+  }
+}
