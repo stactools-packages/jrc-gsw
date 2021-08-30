@@ -1,0 +1,89 @@
+{
+  "type": "Feature",
+  "stac_version": "1.0.0",
+  "id": "0000360000-0000480000_04",
+  "properties": {
+    "start_datetime": "1984-03-01T00:00:00Z",
+    "end_datetime": "2020-12-31T11:59:59Z",
+    "proj:epsg": 4326,
+    "proj:bbox": [-55.75, -15.032, -55.718, -15.0],
+    "proj:shape": [128, 128],
+    "proj:transform": [0.00025, 0.0, -55.75, 0.0, -0.00025, -15.0],
+    "sci:doi": "10.1038/nature20584",
+    "sci:citation": "Jean-Francois Pekel, Andrew Cottam, Noel Gorelick, Alan S. Belward, High-resolution mapping of global surface water and its long-term changes. Nature 540, 418-422 (2016)",
+    "version": "VER4-0",
+    "datetime": null
+  },
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [-55.718, -15.032],
+        [-55.718, -15.0],
+        [-55.75, -15.0],
+        [-55.75, -15.032],
+        [-55.718, -15.032]
+      ]
+    ]
+  },
+  "links": [
+    {
+      "rel": "cite-as",
+      "href": "https://doi.org/10.1038/nature20584"
+    },
+    {
+      "rel": "root",
+      "href": "../../collection.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "collection",
+      "href": "../collection.json",
+      "type": "application/json"
+    },
+    {
+      "rel": "parent",
+      "href": "../collection.json",
+      "type": "application/json"
+    }
+  ],
+  "assets": {
+    "monthly-recurrence": {
+      "href": "../../../tests/data-files/MonthlyRecurrence/LATEST/tiles/monthlyRecurrence4/0000360000-0000480000.tif",
+      "type": "image/tiff; application=geotiff; profile=cloud-optimized",
+      "title": "Monthly Recurrence",
+      "description": "Monthly measures of the seasonality of water based on the occurrence values detected in that month over all years.",
+      "file:size": 33166,
+      "raster:bands": [
+        {
+          "sampling": "area",
+          "data_type": "int16"
+        }
+      ],
+      "roles": ["data"]
+    },
+    "monthly-recurrence-observations": {
+      "href": "../../../tests/data-files/MonthlyRecurrence/LATEST/tiles/has_observations4/0000360000-0000480000.tif",
+      "type": "image/tiff; application=geotiff; profile=cloud-optimized",
+      "title": "Monthly Recurrence Observations",
+      "description": "Binary indicator of presence of seasonal water based on the occurrence values detected in that month over all years.",
+      "file:size": 33166,
+      "raster:bands": [
+        {
+          "sampling": "area",
+          "data_type": "int16"
+        }
+      ],
+      "roles": ["data"]
+    }
+  },
+  "bbox": [-55.75, -15.032, -55.718, -15.0],
+  "stac_extensions": [
+    "https://stac-extensions.github.io/file/v2.0.0/schema.json",
+    "https://stac-extensions.github.io/raster/v1.0.0/schema.json",
+    "https://stac-extensions.github.io/projection/v1.0.0/schema.json",
+    "https://stac-extensions.github.io/scientific/v1.0.0/schema.json",
+    "https://stac-extensions.github.io/version/v1.0.0/schema.json"
+  ],
+  "collection": "jrc_gsw_monthly_recurrence"
+}

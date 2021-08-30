@@ -5,13 +5,18 @@
   "description": "Year-by-year classification of the seasonality of water based on the occurrence values detected throughout the year.",
   "links": [
     {
-      "rel": "root",
-      "href": "../collection.json",
+      "rel": "cite-as",
+      "href": "https://doi.org/10.1038/nature20584"
+    },
+    {
+      "rel": "item",
+      "href": "./0000360000-0000480000_1984/0000360000-0000480000_1984.json",
       "type": "application/json"
     },
     {
-      "rel": "cite-as",
-      "href": "https://doi.org/10.1038/nature20584"
+      "rel": "root",
+      "href": "../collection.json",
+      "type": "application/json"
     },
     {
       "rel": "parent",
@@ -30,40 +35,14 @@
       "title": "Yearly Classification",
       "description": "Year-by-year classification of the seasonality of water based on the occurrence values detected throughout the year.",
       "type": "image/tiff; application=geotiff; profile=cloud-optimized",
-      "roles": [
-        "data"
-      ]
+      "roles": ["data"]
     }
   },
   "title": "European Commission Joint Research Centre - Global Surface Water (Yearly Classification)",
-  "extent": {
-    "spatial": {
-      "bbox": [
-        [
-          -180,
-          -56,
-          180,
-          78
-        ]
-      ]
-    },
-    "temporal": {
-      "interval": [
-        [
-          "1984-03-01T00:00:00Z",
-          "2020-12-31T11:59:59Z"
-        ]
-      ]
-    }
-  },
-  "license": "CC-BY-4.0",
   "providers": [
     {
       "name": "European Commission Joint Research Centre",
-      "roles": [
-        "producer",
-        "processor"
-      ],
+      "roles": ["producer", "processor"],
       "url": "https://global-surface-water.appspot.com/"
     }
   ],
@@ -73,9 +52,16 @@
       "type": "application/pdf",
       "title": "User Guide",
       "description": "Data users guide and description of the JRC GSW datasets.",
-      "roles": [
-        "metadata"
-      ]
+      "roles": ["metadata"]
     }
-  }
+  },
+  "extent": {
+    "spatial": {
+      "bbox": [[-180, -56, 180, 78]]
+    },
+    "temporal": {
+      "interval": [["1984-03-01T00:00:00Z", "2020-12-31T11:59:59Z"]]
+    }
+  },
+  "license": "CC-BY-4.0"
 }
