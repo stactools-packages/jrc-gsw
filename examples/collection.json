@@ -35,7 +35,7 @@
     },
     {
       "rel": "self",
-      "href": "absolute/path/to/here/collection.json",
+      "href": "path/to/collection.json",
       "type": "application/json"
     }
   ],
@@ -45,15 +45,6 @@
   "sci:doi": "10.1038/nature20584",
   "sci:citation": "Jean-Francois Pekel, Andrew Cottam, Noel Gorelick, Alan S. Belward, High-resolution mapping of global surface water and its long-term changes. Nature 540, 418-422 (2016)",
   "title": "European Commission Joint Research Centre - Global Surface Water",
-  "extent": {
-    "spatial": {
-      "bbox": [[-180, -56, 180, 78]]
-    },
-    "temporal": {
-      "interval": [["1984-03-01T00:00:00Z", "2020-12-31T11:59:59Z"]]
-    }
-  },
-  "license": "CC-BY-4.0",
   "providers": [
     {
       "name": "European Commission Joint Research Centre",
@@ -69,5 +60,14 @@
       "description": "Data users guide and description of the JRC GSW datasets.",
       "roles": ["metadata"]
     }
-  }
+  },
+  "extent": {
+    "spatial": {
+      "bbox": [[-180, -56, 180, 78]]
+    },
+    "temporal": {
+      "interval": [["1984-03-01T00:00:00Z", "2020-12-31T11:59:59Z"]]
+    }
+  },
+  "license": "CC-BY-4.0"
 }

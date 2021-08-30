@@ -5,13 +5,18 @@
   "description": "Global surface water datasets (occurrence, change, seasonality, recurrence, transitions and maximum extent) aggregated over 1984 - 2020.",
   "links": [
     {
-      "rel": "root",
-      "href": "../collection.json",
+      "rel": "cite-as",
+      "href": "https://doi.org/10.1038/nature20584"
+    },
+    {
+      "rel": "item",
+      "href": "./0000360000-0000480000/0000360000-0000480000.json",
       "type": "application/json"
     },
     {
-      "rel": "cite-as",
-      "href": "https://doi.org/10.1038/nature20584"
+      "rel": "root",
+      "href": "../collection.json",
+      "type": "application/json"
     },
     {
       "rel": "parent",
@@ -30,25 +35,19 @@
       "title": "Occurrence",
       "description": "Frequency with which water was present from March 1984 to December 2020",
       "type": "image/tiff; application=geotiff; profile=cloud-optimized",
-      "roles": [
-        "data"
-      ]
+      "roles": ["data"]
     },
     "change": {
       "title": "Occurrence Change Intensity",
       "description": "Change in water occurrence between the two periods (1984-1999) and (2000-2020)",
       "type": "image/tiff; application=geotiff; profile=cloud-optimized",
-      "roles": [
-        "data"
-      ]
+      "roles": ["data"]
     },
     "seasonality": {
       "title": "Seasonality",
       "description": "Number of months that water was present from January 2020 to December 2020",
       "type": "image/tiff; application=geotiff; profile=cloud-optimized",
-      "roles": [
-        "data"
-      ],
+      "roles": ["data"],
       "start_datetime": "2020-01-01T00:00:00Z",
       "end_datetime": "2020-12-31T11:59:59Z"
     },
@@ -56,56 +55,26 @@
       "title": "Recurrence",
       "description": "Frequency with which water returns from year to year",
       "type": "image/tiff; application=geotiff; profile=cloud-optimized",
-      "roles": [
-        "data"
-      ]
+      "roles": ["data"]
     },
     "transitions": {
       "title": "Transitions",
       "description": "Categorical change in surface water status from 1984 to 2020",
       "type": "image/tiff; application=geotiff; profile=cloud-optimized",
-      "roles": [
-        "data"
-      ]
+      "roles": ["data"]
     },
     "extent": {
       "title": "Maximum Water Extent",
       "description": "Binary indicator of whether water was ever present (from 1984-2020)",
       "type": "image/tiff; application=geotiff; profile=cloud-optimized",
-      "roles": [
-        "data"
-      ]
+      "roles": ["data"]
     }
   },
   "title": "European Commission Joint Research Centre - Global Surface Water (Aggregated)",
-  "extent": {
-    "spatial": {
-      "bbox": [
-        [
-          -180,
-          -56,
-          180,
-          78
-        ]
-      ]
-    },
-    "temporal": {
-      "interval": [
-        [
-          "1984-03-01T00:00:00Z",
-          "2020-12-31T11:59:59Z"
-        ]
-      ]
-    }
-  },
-  "license": "CC-BY-4.0",
   "providers": [
     {
       "name": "European Commission Joint Research Centre",
-      "roles": [
-        "producer",
-        "processor"
-      ],
+      "roles": ["producer", "processor"],
       "url": "https://global-surface-water.appspot.com/"
     }
   ],
@@ -115,9 +84,16 @@
       "type": "application/pdf",
       "title": "User Guide",
       "description": "Data users guide and description of the JRC GSW datasets.",
-      "roles": [
-        "metadata"
-      ]
+      "roles": ["metadata"]
     }
-  }
+  },
+  "extent": {
+    "spatial": {
+      "bbox": [[-180, -56, 180, 78]]
+    },
+    "temporal": {
+      "interval": [["1984-03-01T00:00:00Z", "2020-12-31T11:59:59Z"]]
+    }
+  },
+  "license": "CC-BY-4.0"
 }
