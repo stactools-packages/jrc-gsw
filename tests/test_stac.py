@@ -80,7 +80,9 @@ class TestSTAC(unittest.TestCase):
         self.assertEqual(item.id, f"{tile_id}_{month}")
 
         for key, asset in item.assets.items():
-            self.assertTrue("monthlyRecurrence" == key or "has_observations" == key)
+            self.assertTrue(
+                "monthly-recurrence" == key or "monthly-recurrence-observations" == key
+            )
 
         self.assertEqual(len(item.assets), 2)
         self.assertEqual(len(item.stac_extensions), 5)

@@ -29,6 +29,8 @@ from stactools.jrc_gsw.assets import (
     SEASONALITY_KEY,
     TRANSITIONS_KEY,
     MONTHLY_HISTORY_KEY,
+    MONTHLY_RECURRENCE_KEY,
+    MONTHLY_RECURRENCE_OBSERVATIONS_KEY,
     YEARLY_CLASSIFICATION_KEY,
 )
 from stactools.jrc_gsw.collections import (
@@ -191,8 +193,8 @@ def create_item(
             recurrence_href = source.replace("has_observations", "monthlyRecurrence")
 
         asset_types = {
-            "monthlyRecurrence": recurrence_href,
-            "has_observations": observations_href,
+            MONTHLY_RECURRENCE_KEY: recurrence_href,
+            MONTHLY_RECURRENCE_OBSERVATIONS_KEY: observations_href,
         }
 
         for k, v in asset_types.items():
