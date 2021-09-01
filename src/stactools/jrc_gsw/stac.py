@@ -4,6 +4,7 @@ import os.path
 
 from dateutil.relativedelta import relativedelta
 from typing import Optional
+from urllib.parse import urlparse
 
 import rasterio as rio
 from shapely.geometry import box, mapping, shape
@@ -88,8 +89,11 @@ def collect_raster_stats(href: str) -> dict:
     return raster_stats
 
 
-def assemble_asset(asset_defn: AssetDefinition, href: str) -> dict:
+def assemble_asset(asset_defn: AssetDefinition, href: str, destination: str) -> dict:
     raster_stats = collect_raster_stats(href)
+
+    if not uri_validator(href):
+        href = os.path.relpath(href, destination)
 
     return {
         "asset_defn": asset_defn.create_asset(href),
@@ -97,14 +101,25 @@ def assemble_asset(asset_defn: AssetDefinition, href: str) -> dict:
     }
 
 
+def uri_validator(x: str) -> bool:
+    try:
+        result = urlparse(x)
+        return all([result.scheme, result.netloc])
+    except Exception:
+        return False
+
+
 def create_item(
     source: str,
+    destination: str,
     read_href_modifier: Optional[ReadHrefModifier] = None,
 ) -> pystac.Item:
     """Creates a STAC item for a JRC-GSW dataset.
 
     Args:
         source (str): path to COG
+        destination (str): output directory for STAC item
+        read_href_modifier (ReadHrefModifier, optional): extra href modifier
 
     Returns:
         pystac.Item: STAC Item object.
@@ -154,7 +169,9 @@ def create_item(
             (TRANSITIONS_KEY, agg_hrefs["transitions"]),
             (EXTENT_KEY, agg_hrefs["extent"]),
         ]:
-            assets[key] = assemble_asset(ITEM_ASSETS[AGGREGATED["ID"]][key], href)
+            assets[key] = assemble_asset(
+                ITEM_ASSETS[AGGREGATED["ID"]][key], href, destination
+            )
 
     elif collection_name == "MonthlyHistory":
         year_month = os.path.basename(source).split("-")[0].split("_")
@@ -171,7 +188,7 @@ def create_item(
         }
 
         assets[MONTHLY_HISTORY_KEY] = assemble_asset(
-            ITEM_ASSETS[MONTHLY_HISTORY["ID"]][MONTHLY_HISTORY_KEY], source
+            ITEM_ASSETS[MONTHLY_HISTORY["ID"]][MONTHLY_HISTORY_KEY], source, destination
         )
 
     elif collection_name == "MonthlyRecurrence":
@@ -199,7 +216,9 @@ def create_item(
         }
 
         for k, v in asset_types.items():
-            assets[k] = assemble_asset(ITEM_ASSETS[MONTHLY_RECURRENCE["ID"]][k], v)
+            assets[k] = assemble_asset(
+                ITEM_ASSETS[MONTHLY_RECURRENCE["ID"]][k], v, destination
+            )
 
     elif collection_name == "YearlyClassification":
         year = os.path.dirname(source.split("yearlyClassification")[1])
@@ -213,7 +232,9 @@ def create_item(
         }
 
         assets[YEARLY_CLASSIFICATION_KEY] = assemble_asset(
-            ITEM_ASSETS[YEARLY_CLASSIFICATION["ID"]][YEARLY_CLASSIFICATION_KEY], source
+            ITEM_ASSETS[YEARLY_CLASSIFICATION["ID"]][YEARLY_CLASSIFICATION_KEY],
+            source,
+            destination,
         )
 
     first_asset_key = list(assets.keys())[0]

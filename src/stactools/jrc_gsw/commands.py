@@ -86,7 +86,7 @@ def create_jrc_gsw_command(cli):
                           structure found in:
                           http://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/GSWE/
         """
-        item = stac.create_item(source)
+        item = stac.create_item(source, destination)
         item_path = os.path.join(destination, f"{item.id}.json")
         item.set_self_href(item_path)
         item.save_object()

@@ -1,3 +1,4 @@
+import os
 import unittest
 from dateutil.relativedelta import relativedelta
 
@@ -15,7 +16,10 @@ class TestSTAC(unittest.TestCase):
         args = {
             "source": test_data.get_path(
                 f"data-files/Aggregated/LATEST/change/tiles/change-{tile_id}.tif"  # noqa
-            )
+            ),
+            "destination": os.path.abspath(
+                "examples/jrc_gsw_aggregated/0000360000-0000480000"
+            ),
         }
 
         item = create_item(**args)
@@ -46,7 +50,10 @@ class TestSTAC(unittest.TestCase):
         args = {
             "source": test_data.get_path(
                 f"data-files/MonthlyHistory/LATEST/tiles/{year}/{year}_{month}/{year}_{month}-{tile_id}.tif"  # noqa
-            )
+            ),
+            "destination": os.path.abspath(
+                "examples/jrc_gsw_monthly_history/0000360000-0000480000_1984_04"
+            ),
         }
 
         item = create_item(**args)
@@ -72,7 +79,10 @@ class TestSTAC(unittest.TestCase):
         args = {
             "source": test_data.get_path(
                 f"data-files/MonthlyRecurrence/LATEST/tiles/monthlyRecurrence{int(month)}/{tile_id}.tif",  # noqa
-            )
+            ),
+            "destination": os.path.abspath(
+                "examples/jrc_gsw_monthly_recurrence/0000360000-0000480000_04"
+            ),
         }
 
         item = create_item(**args)
@@ -95,7 +105,10 @@ class TestSTAC(unittest.TestCase):
         args = {
             "source": test_data.get_path(
                 f"data-files/YearlyClassification/LATEST/tiles/yearlyClassification{year}/yearlyClassification{year}-{tile_id}.tif"  # noqa
-            )
+            ),
+            "destination": os.path.abspath(
+                "examples/jrc_gsw_yearly_classification/0000360000-0000480000_1984"
+            ),
         }
 
         item = create_item(**args)
