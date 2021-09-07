@@ -2,7 +2,7 @@
 
 - Name: EC Joint Research Centre - Global Surface Water
 - Package: `stactools.jrc_gsw`
-- PyPI: https://pypi.org/project/stactools-package/
+- PyPI: https://pypi.org/project/stactools-jrc-gsw/
 - Owner: @sparkgeo
 - Dataset homepage: https://global-surface-water.appspot.com/
 - STAC extensions used:
