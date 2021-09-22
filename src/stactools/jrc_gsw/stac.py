@@ -158,9 +158,14 @@ def create_item(
 
         agg_hrefs = {}
         for agg_type in agg_types:
-            agg_hrefs[
-                agg_type
-            ] = f"{root_path}/Aggregated/{DOWNLOAD_VERSION}/{agg_type}/tiles/{agg_type}-{item_id}.tif"  # noqa
+            agg_hrefs[agg_type] = os.path.join(
+                root_path,
+                "Aggregated",
+                DOWNLOAD_VERSION,
+                agg_type,
+                "tiles",
+                f"{agg_type}-{item_id}.tif",
+            )
 
         start_datetime = START_TIME
         end_datetime = END_TIME
