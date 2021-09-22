@@ -43,12 +43,10 @@ from stactools.jrc_gsw.collections import (
 
 from stactools.jrc_gsw.constants import (
     CITATION,
-    DOWNLOAD_VERSION,
     DOI,
     END_TIME,
     EPSG,
     JRC_GSW_PROVIDER,
-    LATEST_VERSION,
     LICENSE,
     START_TIME,
 )
@@ -123,6 +121,8 @@ def uri_validator(x: str) -> bool:
 def create_item(
     source: str,
     destination: Optional[str] = None,
+    downloaded_version: Optional[str] = "LATEST",
+    data_version: Optional[str] = "VER4-0",
     read_href_modifier: Optional[ReadHrefModifier] = None,
 ) -> pystac.Item:
     """Creates a STAC item for a JRC-GSW dataset.
@@ -131,6 +131,11 @@ def create_item(
         source (str): path to COG
         destination (str, optional): local STAC directory to which
             asset paths will be made relative
+        downloaded_version (str, optional): child directory within collection directory,
+            indicating the data version. Default: "LATEST".
+            Currently, should be one of: LATEST|VER1-0|VER2-0|VER3-0|VER4-0
+        data_version (str, optional): Version of the data. Default: "VER4-0".
+            Currently, should be one of: VER1-0|VER2-0|VER3-0|VER4-0|
         read_href_modifier (ReadHrefModifier, optional): extra href modifier
 
     Returns:
@@ -138,7 +143,7 @@ def create_item(
     """
 
     collection_name = os.path.basename(
-        os.path.dirname(source.split(DOWNLOAD_VERSION)[0])
+        os.path.dirname(source.split(downloaded_version)[0])
     )
 
     item_id = os.path.splitext("-".join(os.path.basename(source).split("-")[-2:]))[0]
@@ -162,7 +167,7 @@ def create_item(
             agg_hrefs[agg_type] = os.path.join(
                 root_path,
                 "Aggregated",
-                DOWNLOAD_VERSION,
+                downloaded_version,
                 agg_type,
                 "tiles",
                 f"{agg_type}-{item_id}.tif",
@@ -293,7 +298,7 @@ def create_item(
     scientific.citation = CITATION
 
     version = ItemVersionExtension.ext(item, add_if_missing=True)
-    version.version = LATEST_VERSION
+    version.version = data_version
 
     return item
 
