@@ -98,7 +98,7 @@ def collect_raster_stats(
 def assemble_asset(
     asset_defn: AssetDefinition,
     href: str,
-    destination: str,
+    destination: Optional[str],
     read_href_modifier: Optional[ReadHrefModifier],
 ) -> dict:
     raster_stats = collect_raster_stats(href, read_href_modifier)
@@ -122,14 +122,15 @@ def uri_validator(x: str) -> bool:
 
 def create_item(
     source: str,
-    destination: str,
+    destination: Optional[str] = None,
     read_href_modifier: Optional[ReadHrefModifier] = None,
 ) -> pystac.Item:
     """Creates a STAC item for a JRC-GSW dataset.
 
     Args:
         source (str): path to COG
-        destination (str): output directory for STAC item
+        destination (str, optional): local STAC directory to which
+            asset paths will be made relative
         read_href_modifier (ReadHrefModifier, optional): extra href modifier
 
     Returns:
@@ -142,11 +143,11 @@ def create_item(
 
     item_id = os.path.splitext("-".join(os.path.basename(source).split("-")[-2:]))[0]
 
-    root_path = os.path.dirname(source.split(collection_name)[0])
-
     assets = {}
 
     if collection_name == "Aggregated":
+        root_path = os.path.dirname(source.split(collection_name)[0]) or ""
+
         agg_types = [
             "change",
             "extent",
