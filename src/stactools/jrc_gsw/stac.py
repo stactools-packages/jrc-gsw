@@ -60,8 +60,14 @@ class UnexpectedPathError(Exception):
     pass
 
 
-def collect_raster_stats(href: str) -> dict:
+def collect_raster_stats(
+    href: str, read_href_modifier: Optional[ReadHrefModifier]
+) -> dict:
     raster_stats = {}
+
+    if read_href_modifier:
+        href = read_href_modifier(href)
+
     with rio.open(href) as ds:
         raster_stats["shape"] = list(ds.shape)
         raster_stats["transform"] = list(ds.transform)
@@ -89,8 +95,13 @@ def collect_raster_stats(href: str) -> dict:
     return raster_stats
 
 
-def assemble_asset(asset_defn: AssetDefinition, href: str, destination: str) -> dict:
-    raster_stats = collect_raster_stats(href)
+def assemble_asset(
+    asset_defn: AssetDefinition,
+    href: str,
+    destination: str,
+    read_href_modifier: Optional[ReadHrefModifier],
+) -> dict:
+    raster_stats = collect_raster_stats(href, read_href_modifier)
 
     if not uri_validator(href):
         href = os.path.relpath(href, destination)
@@ -124,9 +135,6 @@ def create_item(
     Returns:
         pystac.Item: STAC Item object.
     """
-
-    if not read_href_modifier:
-        read_href_modifier = lambda x: x
 
     collection_name = os.path.basename(
         os.path.dirname(source.split(DOWNLOAD_VERSION)[0])
@@ -170,7 +178,10 @@ def create_item(
             (EXTENT_KEY, agg_hrefs["extent"]),
         ]:
             assets[key] = assemble_asset(
-                ITEM_ASSETS[AGGREGATED["ID"]][key], href, destination
+                ITEM_ASSETS[AGGREGATED["ID"]][key],
+                href,
+                destination,
+                read_href_modifier,
             )
 
     elif collection_name == "MonthlyHistory":
@@ -188,7 +199,10 @@ def create_item(
         }
 
         assets[MONTHLY_HISTORY_KEY] = assemble_asset(
-            ITEM_ASSETS[MONTHLY_HISTORY["ID"]][MONTHLY_HISTORY_KEY], source, destination
+            ITEM_ASSETS[MONTHLY_HISTORY["ID"]][MONTHLY_HISTORY_KEY],
+            source,
+            destination,
+            read_href_modifier,
         )
 
     elif collection_name == "MonthlyRecurrence":
@@ -217,7 +231,10 @@ def create_item(
 
         for k, v in asset_types.items():
             assets[k] = assemble_asset(
-                ITEM_ASSETS[MONTHLY_RECURRENCE["ID"]][k], v, destination
+                ITEM_ASSETS[MONTHLY_RECURRENCE["ID"]][k],
+                v,
+                destination,
+                read_href_modifier,
             )
 
     elif collection_name == "YearlyClassification":
@@ -235,6 +252,7 @@ def create_item(
             ITEM_ASSETS[YEARLY_CLASSIFICATION["ID"]][YEARLY_CLASSIFICATION_KEY],
             source,
             destination,
+            read_href_modifier,
         )
 
     first_asset_key = list(assets.keys())[0]
