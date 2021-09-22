@@ -13,11 +13,6 @@ JRC_GSW_PROVIDER = pystac.Provider(
     url="https://global-surface-water.appspot.com/",
 )
 
-# Directory to download data from
-DOWNLOAD_VERSION = "LATEST"
-# Version to record in version extension
-LATEST_VERSION = "VER4-0"
-
 # The overall start and end datetime for this collection.
 START_TIME = str_to_datetime("1984-03-01T00:00:00Z")
 END_TIME = str_to_datetime("2020-12-31T11:59:59Z")
