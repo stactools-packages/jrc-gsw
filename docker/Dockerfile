@@ -7,7 +7,7 @@ WORKDIR /opt/stactools-jrc-gsw
 COPY pyproject.toml setup.cfg ./
 COPY src/stactools/jrc_gsw/__init__.py src/stactools/jrc_gsw/
 RUN pip install . \
-    && rm -r /opt/conda/lib/python3.8/site-packages/stactools/jrc_gsw
+    && rm -r /opt/conda/lib/python3.9/site-packages/stactools/jrc_gsw
 
 COPY src ./src
 RUN pip install .
