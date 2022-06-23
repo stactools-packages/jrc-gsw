@@ -323,7 +323,7 @@ def create_collection(collection_defn: dict) -> pystac.Collection:
         extent=pystac.Extent(
             pystac.SpatialExtent([collection_defn["SPATIAL_EXTENT"]]),
             pystac.TemporalExtent(
-                [collection_defn["START_TIME"], collection_defn["END_TIME"]]
+                [[collection_defn["START_TIME"], collection_defn["END_TIME"]]]
             ),
         ),
         catalog_type=pystac.CatalogType.RELATIVE_PUBLISHED,
